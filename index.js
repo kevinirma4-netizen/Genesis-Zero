@@ -437,11 +437,13 @@ function getPlayerData(
 
   return {
     currentScore,
+
     highestScore:
       Math.max(
         currentScore,
         highestScore
       ),
+
     history:
       Array.isArray(
         raw.history
@@ -711,6 +713,7 @@ async function refreshTryout(
           lobby
         )
       ],
+
       components:
         tryoutButtons(
           lobby
@@ -845,7 +848,8 @@ function finalTryoutEmbed(
   userId,
   current,
   best,
-  stats
+  stats,
+  fixes
 ) {
   const roleId =
     OVR_ROLES[current];
@@ -895,24 +899,54 @@ function finalTryoutEmbed(
         {
           name:
             '◈ OVR',
+
           value:
             `**${current}/10**\n${roleText}`,
+
           inline:
             true
         },
+
         {
           name:
             '◆ BEST RESULT',
+
           value:
             `**${best}**`,
+
           inline:
             true
         },
+
         {
           name:
             '✦ STATS',
+
           value:
-            statsText
+            statsText,
+
+          inline:
+            false
+        },
+
+        {
+          name:
+            '📝 THINGS TO FIX',
+
+          value:
+            fixes && fixes.trim()
+              ? fixes
+                  .trim()
+                  .split('\n')
+                  .map(
+                    line =>
+                      `> ${line.trim()}`
+                  )
+                  .join('\n')
+              : '> Nothing specific noted.',
+
+          inline:
+            false
         }
       )
       .setFooter({
@@ -1101,6 +1135,7 @@ async function refreshAnnouncement(
           announcement
         )
       ],
+
       components:
         announcementButtons(
           announcement
@@ -1154,6 +1189,7 @@ async function pingAnnouncement(
         mentionRole(
           roleId
         ),
+
       allowedMentions: {
         roles: [
           roleId
@@ -1501,6 +1537,7 @@ async function refreshScrim(
               scrim
             )
       ],
+
       components:
         scrim.phase ===
         'selected'
@@ -1657,22 +1694,29 @@ function scrimResultEmbed(
         {
           name:
             '◈ ROUNDS',
+
           value:
             roundsText,
+
           inline:
             true
         },
+
         {
           name:
             '◆ MVP',
+
           value:
             mvpText,
+
           inline:
             true
         },
+
         {
           name:
             '✦ PARTICIPANTS',
+
           value:
             result.participants.length
               ? result.participants
@@ -1891,22 +1935,29 @@ function publicFinalScrimEmbed(
         {
           name:
             '◈ ROUND BREAKDOWN',
+
           value:
             roundsText,
+
           inline:
             true
         },
+
         {
           name:
             '◆ MVP',
+
           value:
             mvp,
+
           inline:
             true
         },
+
         {
           name:
             '✦ LINEUP',
+
           value:
             participants
         }
@@ -1932,6 +1983,7 @@ function buildCommands() {
       .setDescription(
         'Azure Of The Latch tryout tools'
       )
+
       .addSubcommand(
         sub =>
           sub
@@ -1942,6 +1994,7 @@ function buildCommands() {
               'Create a tryout lobby'
             )
       )
+
       .addSubcommand(
         sub =>
           sub
@@ -1952,6 +2005,7 @@ function buildCommands() {
               'Create a tryout result'
             )
       )
+
       .addSubcommand(
         sub =>
           sub
@@ -1961,6 +2015,7 @@ function buildCommands() {
             .setDescription(
               'Create a tryout announcement'
             )
+
             .addStringOption(
               option =>
                 option
@@ -1988,6 +2043,7 @@ function buildCommands() {
                     }
                   )
             )
+
             .addIntegerOption(
               option =>
                 option
@@ -2017,6 +2073,7 @@ function buildCommands() {
       .setDescription(
         'Azure Of The Latch scrim tools'
       )
+
       .addSubcommand(
         sub =>
           sub
@@ -2027,6 +2084,7 @@ function buildCommands() {
               'Create a scrim'
             )
       )
+
       .addSubcommand(
         sub =>
           sub
@@ -2037,6 +2095,7 @@ function buildCommands() {
               'Create a scrim result'
             )
       )
+
       .addSubcommand(
         sub =>
           sub
@@ -2046,6 +2105,7 @@ function buildCommands() {
             .setDescription(
               'Create a scrim announcement'
             )
+
             .addStringOption(
               option =>
                 option
@@ -2073,6 +2133,7 @@ function buildCommands() {
                     }
                   )
             )
+
             .addStringOption(
               option =>
                 option
@@ -2100,6 +2161,7 @@ function buildCommands() {
                     }
                   )
             )
+
             .addIntegerOption(
               option =>
                 option
@@ -2171,6 +2233,7 @@ function updatePresence() {
       {
         name:
           `Azure Of The Latch • ${tryouts.size}T / ${scrims.size}S`,
+
         type:
           ActivityType.Watching
       }
@@ -2186,6 +2249,7 @@ client.on(
   'interactionCreate',
   async interaction => {
     try {
+
       /* =====================================
          CHAT INPUT
       ===================================== */
@@ -2201,6 +2265,7 @@ client.on(
           return interaction.reply({
             content:
               '❌ You need a Tryout Hoster role.',
+
             flags:
               MessageFlags.Ephemeral
           });
@@ -2217,6 +2282,7 @@ client.on(
           interaction.commandName ===
           'tryout'
         ) {
+
           if (
             sub ===
             'create'
@@ -2233,6 +2299,7 @@ client.on(
               return interaction.reply({
                 content:
                   '❌ You already have an active tryout.',
+
                 flags:
                   MessageFlags.Ephemeral
               });
@@ -2314,6 +2381,7 @@ client.on(
             return interaction.reply({
               content:
                 '✅ Tryout created.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2462,6 +2530,7 @@ client.on(
           interaction.commandName ===
           'scrim'
         ) {
+
           if (
             sub ===
             'create'
@@ -2478,6 +2547,7 @@ client.on(
               return interaction.reply({
                 content:
                   '❌ You already have an active scrim.',
+
                 flags:
                   MessageFlags.Ephemeral
               });
@@ -2535,6 +2605,7 @@ client.on(
             return interaction.reply({
               content:
                 '✅ Scrim created.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2559,6 +2630,7 @@ client.on(
               return interaction.reply({
                 content:
                   '❌ ELO requires the Main Team role.',
+
                 flags:
                   MessageFlags.Ephemeral
               });
@@ -2645,10 +2717,6 @@ client.on(
               modal
             );
           }
-
-          /* =================================
-             SCRIM RESULTS
-          ================================= */
 
           if (
             sub ===
@@ -2746,12 +2814,13 @@ client.on(
       }
 
       /* =====================================
-         USER SELECT
+         USER SELECT MENUS
       ===================================== */
 
       if (
         interaction.isUserSelectMenu()
       ) {
+
         if (
           interaction.customId ===
           'result_player'
@@ -2805,8 +2874,7 @@ client.on(
         ) {
           const sessionId =
             interaction.customId.slice(
-              'scrim_participants:'
-                .length
+              'scrim_participants:'.length
             );
 
           const result =
@@ -2818,6 +2886,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired. Please use /scrim results again.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2842,10 +2911,6 @@ client.on(
           });
         }
 
-        /* =================================
-           MVP PLAYER SELECT
-        ================================= */
-
         if (
           interaction.customId.startsWith(
             'result_mvp_player:'
@@ -2853,8 +2918,7 @@ client.on(
         ) {
           const sessionId =
             interaction.customId.slice(
-              'result_mvp_player:'
-                .length
+              'result_mvp_player:'.length
             );
 
           const result =
@@ -2869,6 +2933,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2882,6 +2947,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ MVP must be one of the selected participants.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2906,7 +2972,9 @@ client.on(
         const id =
           interaction.customId;
 
-        /* RESULT TYPE */
+        /* -----------------------------------
+           TRYOUT RESULT TYPE
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -2914,9 +2982,7 @@ client.on(
           )
         ) {
           const parts =
-            id.split(
-              ':'
-            );
+            id.split(':');
 
           return interaction.showModal(
             resultModal(
@@ -2926,7 +2992,9 @@ client.on(
           );
         }
 
-        /* TRYOUT JOIN */
+        /* -----------------------------------
+           TRYOUT JOIN
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -2936,8 +3004,7 @@ client.on(
           const lobby =
             tryouts.get(
               id.slice(
-                'tryout_join:'
-                  .length
+                'tryout_join:'.length
               )
             );
 
@@ -2945,6 +3012,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Tryout not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2958,6 +3026,7 @@ client.on(
             return interaction.reply({
               content:
                 '⚠️ You are already in.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2970,6 +3039,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Tryout is full.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -2986,12 +3056,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ You joined the tryout.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* TRYOUT LEAVE */
+        /* -----------------------------------
+           TRYOUT LEAVE
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3001,8 +3074,7 @@ client.on(
           const lobby =
             tryouts.get(
               id.slice(
-                'tryout_leave:'
-                  .length
+                'tryout_leave:'.length
               )
             );
 
@@ -3010,6 +3082,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Tryout not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3029,12 +3102,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ You left the tryout.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* TRYOUT SERVER LINK */
+        /* -----------------------------------
+           TRYOUT SERVER LINK
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3043,8 +3119,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'tryout_link:'
-                .length
+              'tryout_link:'.length
             );
 
           const lobby =
@@ -3060,6 +3135,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3097,7 +3173,9 @@ client.on(
           );
         }
 
-        /* TRYOUT CLOSE */
+        /* -----------------------------------
+           TRYOUT CLOSE
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3106,8 +3184,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'tryout_close:'
-                .length
+              'tryout_close:'.length
             );
 
           const lobby =
@@ -3123,6 +3200,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3149,11 +3227,14 @@ client.on(
                   )
               )
             ],
+
             components: []
           });
         }
 
-        /* SCRIM TYPE CLOSE */
+        /* -----------------------------------
+           SCRIM TYPE CLOSE
+        ----------------------------------- */
 
         if (
           id ===
@@ -3167,7 +3248,9 @@ client.on(
           });
         }
 
-        /* SCRIM TYPE */
+        /* -----------------------------------
+           SCRIM TYPE
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3176,8 +3259,7 @@ client.on(
         ) {
           const type =
             id.slice(
-              'scrim_type:'
-                .length
+              'scrim_type:'.length
             );
 
           if (
@@ -3190,6 +3272,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ ELO requires the Main Team role.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3204,12 +3287,15 @@ client.on(
                   value.hostId ===
                   interaction.user.id
               )
-              .at(-1);
+              .at(
+                -1
+              );
 
           if (!scrim) {
             return interaction.reply({
               content:
                 '❌ Scrim not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3251,7 +3337,9 @@ client.on(
           return;
         }
 
-        /* SCRIM JOIN */
+        /* -----------------------------------
+           SCRIM JOIN
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3261,8 +3349,7 @@ client.on(
           const scrim =
             scrims.get(
               id.slice(
-                'scrim_join:'
-                  .length
+                'scrim_join:'.length
               )
             );
 
@@ -3270,6 +3357,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3285,6 +3373,7 @@ client.on(
             return interaction.reply({
               content:
                 '⚠️ You are already in the queue.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3297,6 +3386,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Queue is full.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3317,12 +3407,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Joined the scrim queue.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* SCRIM LEAVE */
+        /* -----------------------------------
+           SCRIM LEAVE
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3332,8 +3425,7 @@ client.on(
           const scrim =
             scrims.get(
               id.slice(
-                'scrim_leave:'
-                  .length
+                'scrim_leave:'.length
               )
             );
 
@@ -3341,6 +3433,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3360,12 +3453,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ You left the queue.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* SCRIM POSITION */
+        /* -----------------------------------
+           SCRIM POSITION
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3373,9 +3469,7 @@ client.on(
           )
         ) {
           const parts =
-            id.split(
-              ':'
-            );
+            id.split(':');
 
           const position =
             parts[1];
@@ -3389,6 +3483,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3405,6 +3500,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Join first.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3422,6 +3518,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ That position is already taken.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3437,12 +3534,15 @@ client.on(
           return interaction.reply({
             content:
               `✅ Position set to ${position}.`,
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* SCRIM SERVER */
+        /* -----------------------------------
+           SCRIM SERVER LINK
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3451,8 +3551,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'scrim_link:'
-                .length
+              'scrim_link:'.length
             );
 
           const scrim =
@@ -3468,6 +3567,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3505,7 +3605,9 @@ client.on(
           );
         }
 
-        /* RANDOM PICK */
+        /* -----------------------------------
+           SCRIM RANDOM PICK
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3514,8 +3616,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'scrim_random:'
-                .length
+              'scrim_random:'.length
             );
 
           const scrim =
@@ -3531,6 +3632,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3543,6 +3645,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Random Pick unlocks at 15 players.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3559,12 +3662,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Random lineup selected.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* SELECTED PLAYER READY */
+        /* -----------------------------------
+           SCRIM READY
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3572,9 +3678,7 @@ client.on(
           )
         ) {
           const parts =
-            id.split(
-              ':'
-            );
+            id.split(':');
 
           const scrim =
             scrims.get(
@@ -3588,6 +3692,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3600,6 +3705,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ This button is not yours.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3616,6 +3722,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ You are not selected.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3633,12 +3740,15 @@ client.on(
               player.ready
                 ? '✅ READY.'
                 : '✅ NOT READY.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* SCRIM CLOSE */
+        /* -----------------------------------
+           SCRIM CLOSE
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3647,8 +3757,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'scrim_close:'
-                .length
+              'scrim_close:'.length
             );
 
           const scrim =
@@ -3664,6 +3773,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3690,11 +3800,14 @@ client.on(
                   )
               )
             ],
+
             components: []
           });
         }
 
-        /* ANNOUNCEMENT READY */
+        /* -----------------------------------
+           ANNOUNCEMENT READY
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3704,8 +3817,7 @@ client.on(
           const announcement =
             announcements.get(
               id.slice(
-                'announce_ready:'
-                  .length
+                'announce_ready:'.length
               )
             );
 
@@ -3713,6 +3825,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Announcement not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3735,12 +3848,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Marked READY.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* ANNOUNCEMENT NOT READY */
+        /* -----------------------------------
+           ANNOUNCEMENT NOT READY
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3750,8 +3866,7 @@ client.on(
           const announcement =
             announcements.get(
               id.slice(
-                'announce_notready:'
-                  .length
+                'announce_notready:'.length
               )
             );
 
@@ -3759,6 +3874,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Announcement not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3778,12 +3894,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Marked NOT READY.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* ANNOUNCEMENT RE-PING */
+        /* -----------------------------------
+           ANNOUNCEMENT RE-PING
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3793,8 +3912,7 @@ client.on(
           const announcement =
             announcements.get(
               id.slice(
-                'announce_reping:'
-                  .length
+                'announce_reping:'.length
               )
             );
 
@@ -3802,6 +3920,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Announcement not found.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3814,6 +3933,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3825,6 +3945,7 @@ client.on(
             return interaction.reply({
               content:
                 '⚠️ Re-ping already used.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3838,6 +3959,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Re-ping is not available yet.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3857,7 +3979,9 @@ client.on(
           return;
         }
 
-        /* ADD ROUND */
+        /* -----------------------------------
+           SCRIM RESULT - ADD ROUND
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3866,8 +3990,7 @@ client.on(
         ) {
           const sessionId =
             id.slice(
-              'result_add_round:'
-                .length
+              'result_add_round:'.length
             );
 
           const result =
@@ -3879,6 +4002,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3919,7 +4043,9 @@ client.on(
           );
         }
 
-        /* MVP */
+        /* -----------------------------------
+           SCRIM RESULT - MVP
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3928,8 +4054,7 @@ client.on(
         ) {
           const sessionId =
             id.slice(
-              'result_mvp:'
-                .length
+              'result_mvp:'.length
             );
 
           const result =
@@ -3941,6 +4066,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3952,6 +4078,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Select participants first.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -3960,16 +4087,20 @@ client.on(
           return interaction.reply({
             content:
               '◆ **SELECT MVP**',
+
             components:
               mvpPlayerSelect(
                 sessionId
               ),
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* FINISH */
+        /* -----------------------------------
+           SCRIM RESULT - FINISH
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -3978,8 +4109,7 @@ client.on(
         ) {
           const sessionId =
             id.slice(
-              'result_finish:'
-                .length
+              'result_finish:'.length
             );
 
           const result =
@@ -3991,6 +4121,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4017,14 +4148,14 @@ client.on(
             return interaction.reply({
               content:
                 '❌ First to 3 rounds is required.',
+
               flags:
                 MessageFlags.Ephemeral
             });
           }
 
           result.winner =
-            score1 >
-            score2
+            score1 > score2
               ? result.club1
               : result.club2;
 
@@ -4045,10 +4176,6 @@ client.on(
             sessionId
           );
 
-          /*
-          PUBLIC FINAL RESULT
-          */
-
           await interaction.channel.send({
             embeds: [
               publicFinalScrimEmbed(
@@ -4057,21 +4184,19 @@ client.on(
             ]
           });
 
-          /*
-          PRIVATE CONTROL PANEL
-          */
-
           return interaction.update({
             content:
               '✅ **Official scrim result posted publicly.**',
+
             embeds: [],
+
             components: []
           });
         }
       }
 
       /* =====================================
-         MODALS
+         MODAL SUBMISSIONS
       ===================================== */
 
       if (
@@ -4080,7 +4205,9 @@ client.on(
         const id =
           interaction.customId;
 
-        /* ANNOUNCEMENT */
+        /* -----------------------------------
+           ANNOUNCEMENT MODAL
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4089,8 +4216,7 @@ client.on(
         ) {
           const key =
             id.slice(
-              'announce_modal:'
-                .length
+              'announce_modal:'.length
             );
 
           const pending =
@@ -4102,6 +4228,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Announcement session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4151,14 +4278,13 @@ client.on(
                   announcement
                 )
               ],
+
               components:
-                announcementButtons(
-                  {
-                    ...announcement,
-                    messageId:
-                      'pending'
-                  }
-                )
+                announcementButtons({
+                  ...announcement,
+                  messageId:
+                    'pending'
+                })
             });
 
           announcement.messageId =
@@ -4180,12 +4306,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Announcement created.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* TRYOUT SERVER */
+        /* -----------------------------------
+           TRYOUT SERVER MODAL
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4194,8 +4323,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'tryout_server:'
-                .length
+              'tryout_server:'.length
             );
 
           const lobby =
@@ -4211,6 +4339,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4231,6 +4360,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Invalid HTTPS link.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4246,12 +4376,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Server link saved.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* SCRIM SERVER */
+        /* -----------------------------------
+           SCRIM SERVER MODAL
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4260,8 +4393,7 @@ client.on(
         ) {
           const messageId =
             id.slice(
-              'scrim_server:'
-                .length
+              'scrim_server:'.length
             );
 
           const scrim =
@@ -4277,6 +4409,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Host only.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4297,6 +4430,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Invalid HTTPS link.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4312,12 +4446,15 @@ client.on(
           return interaction.reply({
             content:
               '✅ Server link saved.',
+
             flags:
               MessageFlags.Ephemeral
           });
         }
 
-        /* TRYOUT RESULT */
+        /* -----------------------------------
+           TRYOUT RESULT STATS
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4325,9 +4462,7 @@ client.on(
           )
         ) {
           const parts =
-            id.split(
-              ':'
-            );
+            id.split(':');
 
           const type =
             parts[1];
@@ -4355,8 +4490,7 @@ client.on(
 
           for (
             let index = 0;
-            index <
-              labels.length;
+            index < labels.length;
             index++
           ) {
             const score =
@@ -4374,6 +4508,7 @@ client.on(
               return interaction.reply({
                 content:
                   `❌ ${labels[index]} must be from 0 to 10.`,
+
                 flags:
                   MessageFlags.Ephemeral
               });
@@ -4466,7 +4601,8 @@ client.on(
                 userId
               )
               .catch(
-                () => null
+                () =>
+                  null
               );
 
           if (
@@ -4484,7 +4620,8 @@ client.on(
                 userId,
                 current,
                 `${best}/10`,
-                stats
+                stats,
+                fixes
               )
             ],
 
@@ -4505,7 +4642,9 @@ client.on(
           });
         }
 
-        /* SCRIM SETUP */
+        /* -----------------------------------
+           SCRIM SETUP
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4514,8 +4653,7 @@ client.on(
         ) {
           const sessionId =
             id.slice(
-              'scrim_setup_'
-                .length
+              'scrim_setup_'.length
             );
 
           const result =
@@ -4527,6 +4665,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired. Please use /scrim results again.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4577,7 +4716,9 @@ client.on(
           });
         }
 
-        /* SCRIM ROUND */
+        /* -----------------------------------
+           SCRIM ROUND
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4586,8 +4727,7 @@ client.on(
         ) {
           const sessionId =
             id.slice(
-              'scrim_round_'
-                .length
+              'scrim_round_'.length
             );
 
           const result =
@@ -4599,6 +4739,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4611,6 +4752,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Maximum 6 rounds.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4629,6 +4771,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Use this format: 5-3',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4651,6 +4794,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ A round cannot be a draw.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4668,8 +4812,7 @@ client.on(
               s2,
 
             winner:
-              s1 >
-              s2
+              s1 > s2
                 ? 1
                 : 2
           });
@@ -4691,7 +4834,9 @@ client.on(
           });
         }
 
-        /* MVP STATS */
+        /* -----------------------------------
+           SCRIM MVP STATS
+        ----------------------------------- */
 
         if (
           id.startsWith(
@@ -4699,9 +4844,7 @@ client.on(
           )
         ) {
           const parts =
-            id.split(
-              ':'
-            );
+            id.split(':');
 
           const sessionId =
             parts[1];
@@ -4718,6 +4861,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Scrim result session expired.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4753,6 +4897,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ Invalid MVP values.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4766,6 +4911,7 @@ client.on(
             return interaction.reply({
               content:
                 '❌ MVP must be one of the selected participants.',
+
               flags:
                 MessageFlags.Ephemeral
             });
@@ -4815,6 +4961,7 @@ client.on(
           await interaction.followUp({
             content:
               '❌ Something went wrong. Check the console.',
+
             flags:
               MessageFlags.Ephemeral
           });
@@ -4822,6 +4969,7 @@ client.on(
           await interaction.reply({
             content:
               '❌ Something went wrong. Check the console.',
+
             flags:
               MessageFlags.Ephemeral
           });
@@ -4989,10 +5137,6 @@ client.once(
   }
 );
 
-/* =========================================
-   ERRORS
-========================================= */
-
 client.on(
   'error',
   error => {
@@ -5012,10 +5156,6 @@ process.on(
     );
   }
 );
-
-/* =========================================
-   LOGIN
-========================================= */
 
 if (!TOKEN) {
   console.error(
